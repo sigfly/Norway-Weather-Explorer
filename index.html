@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Norway Precipitation Explorer — historical rain, snowfall & snow cover</title>
+<style>
+:root{--bg:#f5f7f7;--paper:#fff;--ink:#153442;--sub:#6b7e89;--border:#dfe8e9;--rain:#0787ae;--snow:#7354bb;--rain-tint:#e6f6fb;--snow-tint:#f0ebfc;--accent:#066c78;--shadow:0 9px 36px rgba(19,53,62,.055)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #8fcdda;outline-offset:2px}a{color:#007d9f;text-decoration:none}a:hover{text-decoration:underline}
+.topbar{background:#fff;border-bottom:1px solid var(--border)}.top-inner{max-width:1510px;padding:17px 28px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:12px;font-weight:760;font-size:15px;letter-spacing:-.025em}.brand-logo{display:grid;place-items:center;color:white;background:#0c5965;border-radius:13px;width:38px;height:38px;box-shadow:0 3px 9px #0c596526}.brand-logo svg{width:25px}.topmeta{display:flex;align-items:center;gap:11px;color:var(--sub);font-size:12px}.dot{width:7px;height:7px;border-radius:50%;background:#35ae8a;display:inline-block;margin-right:4px}.top-pill{border:1px solid var(--border);padding:7px 11px;border-radius:20px;background:#f8fbfb}
+.shell{max-width:1510px;margin:0 auto;padding:32px 28px 42px}.intro{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:26px}.eyebrow{font-weight:750;letter-spacing:.17em;text-transform:uppercase;font-size:10px;color:#05829b;margin:0 0 8px}.intro h1{margin:0 0 9px;font-size:clamp(28px,3.1vw,42px);letter-spacing:-.052em;line-height:1.1;font-weight:770}.intro p{color:var(--sub);margin:0;font-size:14px;max-width:680px}.download-top{align-self:flex-end}
+.main{display:grid;grid-template-columns:minmax(305px,350px) minmax(0,1fr);gap:21px;align-items:start}.sidebar{display:grid;gap:17px}.card{background:var(--paper);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow);overflow:hidden}.pad{padding:19px}.card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}.card h2{margin:0;font-size:15px;font-weight:750;letter-spacing:-.018em}.quiet{font-size:11px;color:#83939d}.card-sub{margin:-6px 0 12px;color:var(--sub);font-size:12px}
+.map-wrap{position:relative;background:linear-gradient(155deg,#e7f2f4,#dcecef);margin:0 12px 12px;border:1px solid #dbe9e9;border-radius:12px;overflow:hidden}.map-svg{display:block;width:100%;height:auto;aspect-ratio:520 / 613;touch-action:none;cursor:crosshair}.graticule line{stroke:#bbd4d9;stroke-width:.8;stroke-dasharray:3 6}.graticule text{font-size:9px;fill:#86a5b0;font-weight:600;pointer-events:none}.neighbor{fill:#d5e0df;stroke:#aabec0;stroke-width:1.05;vector-effect:non-scaling-stroke}.norway{fill:#9ccac1;stroke:#3e9187;stroke-width:1.5;vector-effect:non-scaling-stroke;cursor:crosshair;transition:fill .15s}.norway:hover{fill:#87c0b6}.country-label{fill:#9caeb4;font-size:13px;font-weight:800;letter-spacing:.18em;pointer-events:none}.map-city{cursor:pointer}.map-city circle{fill:#fff;stroke:#386f77;stroke-width:1.3;transition:r .2s}.map-city:hover circle{r:6}.map-city text{font-size:10px;fill:#26505a;font-weight:700;paint-order:stroke;stroke:#ecf6f4;stroke-width:3;stroke-linejoin:round}.pin-outer{fill:#fff;stroke:#056c7d;stroke-width:2.8;pointer-events:none;filter:drop-shadow(0px 2px 3px #13505c55)}.pin-inner{fill:#05768c;pointer-events:none}.pin-halo{fill:#1b94a8;opacity:.12;pointer-events:none}.map-floating{position:absolute;right:10px;bottom:11px;display:flex;flex-direction:column;gap:5px}.map-floating button{width:32px;height:32px;border:1px solid #c8d8da;border-radius:8px;background:#ffffffed;color:#3b6671;font-weight:800;font-size:18px;box-shadow:0 1px 4px #3754611c}.map-bottom{position:absolute;left:10px;bottom:9px;font-size:9px;color:#52757d;background:#f7fbfadf;padding:6px 8px;border-radius:6px;pointer-events:none}.inset{position:absolute;left:11px;top:11px;width:129px;background:#f0f8f8f0;border:1px solid #c5dfdf;border-radius:10px;padding:7px;box-shadow:0 5px 16px #19494f12}.inset-label{font-size:9px;color:#527781;font-weight:800;text-transform:uppercase;letter-spacing:.09em}.inset svg{width:100%;height:auto;cursor:crosshair;display:block}.inset .norway{stroke-width:1.3}.inset-note{font-size:9px;text-align:center;color:#719198}.coord-strip{margin:0 19px 18px;background:#eff7f6;border-radius:10px;padding:10px 12px;display:flex;gap:8px;align-items:center;justify-content:space-between}.coord-strip strong{font-size:12px;display:block}.coord-strip span{display:block;color:#71898d;font-size:10px;margin-top:1px}.coord-strip .coords{font-variant-numeric:tabular-nums;color:#2b6c77;white-space:nowrap;font-size:11px;font-weight:700}.map-hint{font-size:11px;color:var(--sub);margin:10px 19px 18px}
+.form-rows{display:grid;gap:15px}label.form-label{display:block;font-size:11px;font-weight:760;color:#45626d;margin-bottom:6px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}input[type=date],input[type=number],select{width:100%;min-width:0;min-height:40px;border:1px solid #d4e1e3;border-radius:9px;background:#fff;color:#234451;padding:9px 9px;font-size:12px}select{padding-right:3px}.preset-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}.soft-btn{background:#f5faf9;border:1px solid #dbe8e9;color:#466a73;border-radius:8px;padding:7px 10px;font-weight:680;font-size:11px}.soft-btn:hover{background:#e5f1f0}.load-btn{width:100%;display:flex;gap:9px;justify-content:center;align-items:center;padding:12px 16px;border:0;border-radius:10px;background:#0e7280;color:#fff;font-size:13px;font-weight:760;box-shadow:0 5px 12px #13788a29}.load-btn:hover{background:#095d69}.load-btn:disabled{background:#669aa0}.form-note{font-size:10px;color:#81939d;margin:9px 0 0}.form-error{display:none;background:#fff1ed;color:#a4442c;border:1px solid #f6d2c8;padding:10px 11px;border-radius:9px;font-size:12px;margin-top:11px}.form-error.visible{display:block}
+.content{min-width:0}.content-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.period-line{font-size:13px;font-weight:700}.period-meta{font-size:11px;color:var(--sub);margin-top:3px}.actions{display:flex;gap:7px;align-items:center}.btn-outline{display:inline-flex;gap:7px;align-items:center;background:#fff;border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:#345c65;font-size:11px;font-weight:750}.btn-outline:hover{border-color:#86b5ba;background:#f7fbfb}.btn-outline svg{width:14px;height:14px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:19px}.stat{background:#fff;border:1px solid var(--border);border-radius:14px;padding:15px 15px 13px;box-shadow:var(--shadow);min-width:0}.stat:first-child{border-top:3px solid var(--rain)}.stat:nth-child(2){border-top:3px solid var(--snow)}.stat:nth-child(3){border-top:3px solid #6cc3d5}.stat:nth-child(4){border-top:3px solid #ac9bdf}.stat-label{color:#69808b;font-size:10px;font-weight:700;display:flex;align-items:center;gap:7px;margin-bottom:10px}.mini-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--rain)}.mini-dot.snow{background:var(--snow)}.stat-value{font-size:25px;line-height:1.16;font-weight:780;letter-spacing:-.035em;white-space:nowrap;font-variant-numeric:tabular-nums}.stat-value small{font-size:12px;color:#83939a;font-weight:680;letter-spacing:0}.stat-desc{color:#93a2a7;font-size:10px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.section-row{display:flex;align-items:center;justify-content:space-between;margin:0 1px 11px;gap:10px}.section-row h2{font-size:14px;font-weight:780;letter-spacing:-.016em;margin:0}.section-row p{font-size:11px;color:#81939a;margin:0}.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:23px}.chart-card{padding:18px 15px 14px;overflow:hidden}.chart-title{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:750;margin-bottom:1px}.chart-sub{color:#8a9da6;font-size:10px;margin-left:18px}.chart-legend{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--rain)}.chart-legend.snow{background:var(--snow)}.chart-shell{height:198px;margin-top:8px;position:relative}.chart-shell canvas{width:100%;height:100%;display:block}.tooltip{position:absolute;z-index:6;pointer-events:none;display:none;background:#193b47;color:#fff;padding:8px 10px;border-radius:8px;min-width:125px;box-shadow:0 9px 22px #082d3f36;font-size:11px;line-height:1.65}.tooltip strong{font-size:12px}.tooltip .tt-time{color:#afcbd3;font-size:10px}.tooltip .tt-val{font-weight:800;font-variant-numeric:tabular-nums}.canvas-guide{display:block;font-size:9px;color:#99a9ad;margin:-1px 0 0 11px}.statusline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;color:#788d96;font-size:11px;border-top:1px solid var(--border);padding-top:13px}.status-mark{height:7px;width:7px;border-radius:50%;background:#b8c3c8;display:inline-block}.status-mark.ok{background:#44b38d}.status-mark.bad{background:#d48d51}.status-spacer{flex:1}.source-note{padding:15px 17px;border:1px solid #dce8e9;border-radius:13px;background:#edf5f5;margin-top:20px;font-size:11px;color:#647d86;line-height:1.7}.source-note strong{color:#365c64}.source-note a{font-weight:720}.status-live{display:inline-flex;align-items:center;gap:7px}.spinner{width:12px;height:12px;border:2px solid #bfd9de;border-top-color:#0b7b8b;border-radius:50%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:1100px){.main{grid-template-columns:310px minmax(0,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.chart-shell{height:215px}}@media(max-width:790px){.top-inner,.shell{padding-left:16px;padding-right:16px}.main{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}.map-card{grid-row:span 1}.form-card{grid-row:span 1}.map-svg{max-height:440px}.intro{align-items:start}.intro h1{font-size:32px}}@media(max-width:590px){.shell{padding-top:25px}.sidebar{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.charts{grid-template-columns:1fr}.map-svg{max-height:none}.topmeta .top-pill{display:none}.intro h1{font-size:29px}.intro{margin-bottom:20px}.stat{padding:13px}.stat-value{font-size:22px}.section-row{flex-wrap:wrap}.top-inner{padding:14px 16px}.topmeta{font-size:10px}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+
+/* Map upgrade: Leaflet and official Kartverket topo/municipality layers */
+/* Live, keyboard-accessible kommune autocomplete. All matches remain scrollable. */
+.kommune-search-box{position:relative;z-index:1500}
+#kommuneMatches[hidden]{display:none!important}
+.kommune-matches{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:1500;max-height:245px;overflow:auto;overscroll-behavior:contain;box-shadow:0 12px 30px #183c4e29;background:#fff;border:1px solid #b9d4d9;border-radius:10px;padding:5px}
+.kommune-match{display:block;width:100%;text-align:left;border:0;border-radius:7px;background:transparent;padding:9px 11px;color:#2b4b55;font-size:12px;cursor:pointer}
+.kommune-match strong{font-weight:760}.kommune-match span{font-size:10px;color:#81959b;margin-left:6px}
+.kommune-match:hover,.kommune-match.is-active{background:#e8f6f4;color:#065c6d}
+.kommune-empty{padding:11px;color:#607981;font-size:12px}
+.kommune-current{flex:1;min-width:0;align-self:center;padding:2px 0;color:#4d7079;font-size:11px;line-height:1.45}
+
+.main{grid-template-columns:minmax(360px,435px) minmax(0,1fr)}
+.map-card .card-sub{margin-bottom:15px}
+#kommuneSearch{width:100%;height:39px;border:1px solid #d4e1e3;border-radius:9px;padding:8px 10px;font-size:12px;color:#234451;background:#fff}
+.map-select-row{display:flex;gap:7px;margin-top:7px}
+#kommuneSelect{min-width:0;flex:1}
+#clearKommune{flex-shrink:0;border-color:#ccdcde}
+.map-small{font-size:10px;color:#71838c;line-height:1.45;margin:8px 0 0}
+.kart-map-wrap{margin:0 12px 12px;border:1px solid #d6e6e6;background:#e6eee7;overflow:hidden;position:relative;border-radius:12px}
+#kartMap{width:100%;height:455px;z-index:0;background:#e7eeea;cursor:crosshair}
+.leaflet-container{font-family:inherit;font-size:12px}
+.leaflet-control-attribution{font-size:9px!important;line-height:1.3!important;background:#fffdf0dc!important;color:#405864!important}
+.leaflet-control-attribution a{color:#287482!important}
+.leaflet-control-zoom a{color:#225866!important}
+.map-overlay-actions{position:absolute;right:11px;top:11px;z-index:650}
+.map-icon-btn{width:37px;height:37px;border-radius:8px;border:1px solid #c9d8d8;background:#fff;color:#225866;font-size:23px;box-shadow:0 2px 7px #173a471c;cursor:pointer}
+.map-icon-btn:hover{background:#edf8f7}
+.pin-icon-wrap{border:0;background:transparent}
+.kart-pin{display:block;width:29px;height:29px;border:3px solid #184b59;background:#e45b40;border-radius:50% 50% 50% 0;transform:rotate(-45deg);box-shadow:1px 2px 5px #1a2e3e60;position:relative}
+.kart-pin:after{content:'';position:absolute;left:7px;top:7px;width:8px;height:8px;border-radius:50%;border:1px solid #184b59;background:#fff7e9}
+.map-options{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 19px 13px}
+.map-options label{font-size:10px;color:#67818b;font-weight:750;white-space:nowrap}
+#mapStyle{width:185px;min-height:35px;padding:7px 10px}
+.pin-nudge{display:flex;align-items:center;gap:5px;padding:0 19px 1px;flex-wrap:wrap}
+.pin-nudge span{color:#708a91;font-size:10px;font-weight:750;letter-spacing:.04em;margin-right:auto}
+.pin-nudge button{width:34px;height:34px;border:1px solid #d4e3e4;border-radius:8px;background:#fff;font-size:17px;color:#365e68;cursor:pointer}
+.pin-nudge button:hover{background:#e7f4f2}
+.map-mapstatus{padding:0 19px;margin:10px 0 0;color:#41757d;font-size:11px;line-height:1.5;min-height:18px}
+.map-mapstatus.error{color:#b94b32}
+.map-hint{margin:10px 19px 15px;line-height:1.45}
+.city-row{display:flex;flex-wrap:wrap;gap:6px;margin:0 19px 17px}
+.map-card.map-expanded{position:fixed;z-index:5000;inset:12px;width:auto;max-width:none;display:flex;flex-direction:column;overflow-y:auto;box-shadow:0 5px 70px #061b2ec9}
+.map-card.map-expanded .kart-map-wrap{flex:1;min-height:300px}
+.map-card.map-expanded #kartMap{height:100%;min-height:300px}
+.map-card.map-expanded .map-hint,.map-card.map-expanded .city-row{display:none}
+@media(max-width:1080px){.main{grid-template-columns:minmax(325px,375px) minmax(0,1fr)}}
+@media(max-width:900px){.main{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}#kartMap{height:425px}}
+@media(max-width:700px){.sidebar{grid-template-columns:1fr}#kartMap{height:430px}.map-card.map-expanded{inset:5px}}
+</style>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoTjcQncqmi4+I=" crossorigin="anonymous">
+
+<!-- Critical Leaflet layout CSS bundled directly. If the Leaflet CDN stylesheet is blocked,
+     tiles, controls and markers still keep their correct positions. -->
+<style id="leaflet-critical-css">
+/* Leaflet 1.x positioning essentials; kept local so file:// pages don't depend on leaflet.css loading. */
+.leaflet-container{overflow:hidden;outline:0;background:#e7eeea;-webkit-tap-highlight-color:transparent;touch-action:pan-x pan-y}
+.leaflet-container.leaflet-touch-drag{touch-action:pinch-zoom}
+.leaflet-container.leaflet-touch-zoom{touch-action:pan-x pan-y}
+.leaflet-container.leaflet-touch-zoom.leaflet-touch-drag{touch-action:none}
+.leaflet-container:focus{outline:2px solid #80bac3}
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,
+.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{
+ position:absolute;left:0;top:0
+}
+.leaflet-map-pane{position:absolute;left:0;top:0;z-index:auto}
+.leaflet-tile{visibility:hidden;user-select:none;-webkit-user-select:none}
+.leaflet-tile-loaded{visibility:inherit}
+.leaflet-tile-container{pointer-events:none}
+.leaflet-zoom-animated{transform-origin:0 0}
+.leaflet-marker-icon,.leaflet-marker-shadow{display:block}
+.leaflet-pane>svg,.leaflet-pane>canvas{max-width:none!important;max-height:none!important}
+.leaflet-map-pane canvas{z-index:100}
+.leaflet-tile-pane{z-index:200}
+.leaflet-overlay-pane{z-index:400}
+.leaflet-shadow-pane{z-index:500}
+.leaflet-marker-pane{z-index:600}
+.leaflet-tooltip-pane{z-index:650}
+.leaflet-popup-pane{z-index:700}
+.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile,.leaflet-container .leaflet-overlay-pane svg{
+ max-width:none!important;max-height:none!important
+}
+.leaflet-container img.leaflet-tile{border:0;padding:0;margin:0;box-shadow:none}
+.leaflet-container .leaflet-overlay-pane svg{pointer-events:none}
+.leaflet-container .leaflet-overlay-pane svg path{pointer-events:visiblePainted}
+.leaflet-zoom-box{border:2px dotted #277b93;background:rgba(39,123,147,.11);box-sizing:border-box}
+.leaflet-interactive{cursor:pointer}
+.leaflet-grab{cursor:grab}
+.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable{cursor:grabbing}
+.leaflet-container a{color:#087ca0}
+.leaflet-control-container .leaflet-top,.leaflet-control-container .leaflet-bottom{
+ position:absolute;z-index:1000;pointer-events:none
+}
+.leaflet-top{top:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-right{right:0}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
+.leaflet-right .leaflet-control{float:right}
+.leaflet-top .leaflet-control{margin-top:10px}
+.leaflet-bottom .leaflet-control{margin-bottom:10px}
+.leaflet-left .leaflet-control{margin-left:10px}
+.leaflet-right .leaflet-control{margin-right:10px}
+.leaflet-bar{border:2px solid rgba(0,0,0,.18);border-radius:5px;background-clip:padding-box;box-shadow:0 1px 5px rgba(0,0,0,.18)}
+.leaflet-bar a,.leaflet-bar a:hover{background-color:#fff;border-bottom:1px solid #ccc;
+ width:30px;height:30px;line-height:30px;display:block;text-align:center;text-decoration:none;
+ font:bold 20px/30px Arial,Helvetica,sans-serif;color:#1e4b59
+}
+.leaflet-bar a:first-child{border-top-left-radius:3px;border-top-right-radius:3px}
+.leaflet-bar a:last-child{border-bottom-left-radius:3px;border-bottom-right-radius:3px;border-bottom:0}
+.leaflet-bar a:hover{background:#f3f9f9}
+.leaflet-bar a.leaflet-disabled{cursor:default;color:#a7b3b3;background:#f4f4f4}
+.leaflet-container .leaflet-control-attribution{font-size:10px;line-height:1.3;
+ padding:2px 6px;color:#333;background:rgba(255,255,255,.86);box-shadow:0 0 5px #0002
+}
+.leaflet-control-attribution a{text-decoration:none}
+.leaflet-control-attribution a:hover{text-decoration:underline}
+.leaflet-container .leaflet-control-attribution,.leaflet-container .leaflet-control-scale{font-size:11px}
+.leaflet-fade-anim .leaflet-popup{opacity:0;transition:opacity .2s linear}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{background:white;border-radius:8px;box-shadow:0 3px 14px #0003}
+.leaflet-popup-content{margin:14px 18px}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-left:-20px;overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:#fff;box-shadow:0 3px 14px #0003}
+.leaflet-tooltip{position:absolute;padding:6px;background:#fff;border:1px solid #fff;border-radius:3px;box-shadow:0 1px 3px #0003}
+.leaflet-hidden{display:none!important}
+
+/* Fifth chart: estimated snow on the ground (may rise, settle, or melt). */
+:root{--ground:#197d91;--ground-tint:#e8f5f3}
+.chart-legend.ground{background:var(--ground)}
+.snowpack-charts{grid-template-columns:minmax(0,1fr)}
+.snowpack-charts .chart-shell{height:268px}
+.snowpack-config{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px;margin:17px 0 13px;padding:15px;background:#f6fbfa;border:1px solid #dcebea;border-radius:12px}
+.snowpack-config .tuning-field{display:flex;flex-direction:column;gap:5px;flex:1 1 175px;min-width:125px}
+.snowpack-config label{color:#496a72;font-size:11px;font-weight:720}
+.snowpack-config input,.snowpack-config select{width:100%;height:38px;background:white;border:1px solid #cbdfe1;border-radius:8px;padding:6px 10px;color:var(--ink);font:inherit;font-size:13px}
+.snowpack-config input:focus-visible,.snowpack-config select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.snowpack-config [hidden]{display:none!important}
+.snowpack-caption{font-size:11px;color:#657e85;line-height:1.65;margin:7px 3px 17px}
+.snowpack-metrics{display:flex;flex-wrap:wrap;gap:6px 20px;color:#54747e;font-size:12px;margin:6px 0 12px}
+.snowpack-metrics b{color:#166a7a;font-variant-numeric:tabular-nums}
+.fetch-progress{font-size:11px;line-height:1.5;color:#607d87;margin-top:7px;min-height:17px}
+#cancelBtn{margin-top:8px;min-height:36px}
+#cancelBtn[hidden]{display:none!important}
+@media(max-width:590px){.snowpack-config{gap:9px}.snowpack-config .tuning-field{flex-basis:100%}.snowpack-charts .chart-shell{height:232px}}
+</style>
+
+</head>
+<body>
+<header class="topbar"><div class="top-inner"><div class="brand"><div class="brand-logo"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M3 23c5-1 5-9 10-9s5 9 10 9c3 0 4-3 6-4" stroke="white" stroke-width="2.7" stroke-linecap="round"/><path d="M16 4v8M11 8l5 4 5-4" stroke="#b6ecdf" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/></svg></div><span>Norway Weather Explorer</span></div><div class="topmeta"><span><i class="dot"></i>Historical weather archive</span><span class="top-pill">Single HTML file · no API key</span></div></div></header>
+<main class="shell">
+ <div class="intro"><div><div class="eyebrow">PRECIPITATION EXPLORER / NORWAY</div><h1>Rain or snow. Hour by hour.</h1><p>Pick a point in Norway, choose a date range, and see how rain and snow accumulated — including an estimate of snow that stays on the ground.</p></div></div>
+ <div class="main">
+  <aside class="sidebar">
+   <section class="card map-card" aria-label="Choose weather location">
+ <div class="pad" style="padding-bottom:12px">
+  <div class="card-head"><h2>01 / Choose a location</h2><span class="quiet">KARTVERKET MAP</span></div>
+  <p class="card-sub">Search a kommune to zoom to its location. The pin can be moved anywhere, regardless of municipality boundaries.</p>
+  <label class="form-label" for="kommuneSearch">Municipality / kommune</label>
+  <div class="kommune-search-box">
+   <input id="kommuneSearch" type="search" placeholder="Type any kommune name or number…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="kommuneMatches" aria-label="Search municipalities" />
+   <div id="kommuneMatches" class="kommune-matches" role="listbox" aria-label="Matching municipalities" hidden></div>
+  </div>
+  <div class="map-select-row">
+   <div class="kommune-current" id="kommuneCurrent" aria-live="polite">No kommune selected · unrestricted pin</div>
+   <button type="button" class="soft-btn" id="clearKommune" title="Remove the kommune outline">Clear outline</button>
+  </div>
+  <p class="map-small" id="kommuneInfo" aria-live="polite">Loading official municipality list from Kartverket…</p>
+ </div>
+ <div class="map-wrap kart-map-wrap" id="kartMapWrap">
+  <div id="kartMap" role="application" aria-label="Interactive Kartverket topographic map. Drag the pin or click to select a weather location."></div>
+  <div class="map-overlay-actions"><button type="button" id="mapExpand" class="map-icon-btn" aria-label="Expand map" title="Expand or collapse map">⛶</button></div>
+ </div>
+ <div class="map-options">
+  <label for="mapStyle">Base map</label>
+  <select id="mapStyle" aria-label="Select map layer"><option value="topo">Topographic color</option><option value="topograatone">Grayscale</option><option value="toporaster">Hiking map</option></select>
+ </div>
+ <div class="coord-strip"><div><strong id="locationName">Tromsø</strong><span>Selected pin coordinates</span></div><div class="coords" id="locationCoords">69.6492° N, 18.9553° E</div></div>
+ <div class="pin-nudge"><span>MOVE PIN · ~200 M</span><button type="button" data-move="west" aria-label="Move pin west 200 metres">←</button><button type="button" data-move="north" aria-label="Move pin north 200 metres">↑</button><button type="button" data-move="south" aria-label="Move pin south 200 metres">↓</button><button type="button" data-move="east" aria-label="Move pin east 200 metres">→</button></div>
+ <p class="map-mapstatus" id="mapStatus" role="status" aria-live="polite">Loading interactive map…</p>
+ <p class="map-hint">Drag to pan, <b>scroll the mouse wheel to zoom</b>, or use +/−. Kommune borders are for reference only: the pin can go outside them. Click anywhere or enter exact coordinates below.</p>
+ <div id="cityButtons" class="city-row"><button class="soft-btn" type="button" data-place="Oslo">Oslo</button><button class="soft-btn" type="button" data-place="Bergen">Bergen</button><button class="soft-btn" type="button" data-place="Trondheim">Trondheim</button><button class="soft-btn" type="button" data-place="Tromsø">Tromsø</button><button class="soft-btn" type="button" data-place="Longyearbyen">Svalbard</button></div>
+</section>
+   <section class="card form-card"><div class="pad"><div class="card-head"><h2>02 / Set the period</h2><span class="quiet">HISTORICAL DATA</span></div>
+    <form id="requestForm" class="form-rows">
+     <div><div class="two-col"><div><label class="form-label" for="startDate">Start date</label><input id="startDate" type="date" required></div><div><label class="form-label" for="endDate">End date</label><input id="endDate" type="date" required></div></div><div class="preset-row"><button class="soft-btn" type="button" data-days="7">Last 7 days</button><button class="soft-btn" type="button" data-days="30">Last 30 days</button><button class="soft-btn" type="button" data-days="90">Last 90 days</button></div></div>
+     <div><label class="form-label" for="model">Weather dataset</label><select id="model"><option value="">Best available · finer recent data</option><option value="era5_land">ERA5-Land · consistent since 1950</option><option value="era5">ERA5 · consistent since 1940</option></select><div class="form-note">ERA5 datasets are typically delayed by about 5 days.</div></div>
+     <div><label class="form-label">Optional exact coordinates</label><div class="two-col"><input type="number" id="latInput" min="55" max="82" step="0.0001" aria-label="Latitude" placeholder="Latitude"><input type="number" id="lonInput" min="-1" max="36" step="0.0001" aria-label="Longitude" placeholder="Longitude"></div></div>
+     <div><button class="load-btn" id="loadBtn" type="submit"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg><span id="loadText">Load historical weather</span></button><div id="fetchProgress" class="fetch-progress" role="status" aria-live="polite"></div><button type="button" id="cancelBtn" class="soft-btn" hidden>Cancel request</button><div id="errorMsg" class="form-error" role="alert"></div></div>
+    </form>
+   </div></section>
+  </aside>
+  <div class="content">
+   <div class="content-head"><div><div class="period-line" id="periodTitle">Weather at Tromsø</div><div class="period-meta" id="periodMeta">Select a time period to view hourly precipitation</div></div><div class="actions"><button class="btn-outline" id="copyApiBtn" type="button" title="Copy the Open-Meteo API URL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg> API URL</button><button class="btn-outline" id="exportBtn" disabled type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m-4-4 4 4 4-4M5 17v3h14v-3"/></svg> CSV</button></div></div>
+   <div class="stats" aria-label="Weather totals and peaks">
+    <div class="stat"><div class="stat-label"><i class="mini-dot"></i>Total rainfall</div><div class="stat-value" id="totalRain">— <small>mm</small></div><div class="stat-desc">Liquid rain during period</div></div>
+    <div class="stat"><div class="stat-label"><i class="mini-dot snow"></i>Total snowfall</div><div class="stat-value" id="totalSnow">— <small>cm</small></div><div class="stat-desc">Fresh snow, not snow depth</div></div>
+    <div class="stat"><div class="stat-label"><i class="mini-dot"></i>Peak hourly rain</div><div class="stat-value" id="peakRain">— <small>mm</small></div><div class="stat-desc">Largest one-hour amount</div></div>
+    <div class="stat"><div class="stat-label"><i class="mini-dot snow"></i>Peak hourly snow</div><div class="stat-value" id="peakSnow">— <small>cm</small></div><div class="stat-desc">Largest one-hour amount</div></div>
+   </div>
+   <div class="section-row"><h2>Hourly precipitation <span style="font-size:11px;color:#83969e;font-weight:500">/ amount during the preceding hour</span></h2><p>Hover to inspect individual hours</p></div>
+   <div class="charts">
+     <section class="card chart-card"><div class="chart-title"><i class="chart-legend"></i>Hourly rain</div><div class="chart-sub">Liquid precipitation · mm per hour</div><div class="chart-shell" data-chart="rainHour"><canvas id="rainHour"></canvas><div class="tooltip"></div></div></section>
+     <section class="card chart-card"><div class="chart-title"><i class="chart-legend snow"></i>Hourly snowfall</div><div class="chart-sub">Newly fallen snow · cm per hour</div><div class="chart-shell" data-chart="snowHour"><canvas id="snowHour"></canvas><div class="tooltip"></div></div></section>
+   </div>
+   <div class="section-row"><h2>Accumulated precipitation <span style="font-size:11px;color:#83969e;font-weight:500">/ running totals</span></h2><p>Reset to zero at start of selected period</p></div>
+   <div class="charts">
+     <section class="card chart-card"><div class="chart-title"><i class="chart-legend"></i>Accumulated rain</div><div class="chart-sub">Running liquid rainfall · mm</div><div class="chart-shell" data-chart="rainCum"><canvas id="rainCum"></canvas><div class="tooltip"></div></div></section>
+     <section class="card chart-card"><div class="chart-title"><i class="chart-legend snow"></i>Accumulated snowfall</div><div class="chart-sub">Running new snowfall · cm (not snow on ground)</div><div class="chart-shell" data-chart="snowCum"><canvas id="snowCum"></canvas><div class="tooltip"></div></div></section>
+   </div>
+   <div class="section-row"><h2>Estimated snow on the ground <span style="font-size:11px;color:#83969e;font-weight:500">/ snowfall − melting − settling</span></h2><p>Depth can decrease during the period</p></div>
+   <div class="snowpack-metrics" aria-live="polite"><span>Snow depth at end: <b id="snowGroundEnd">— cm</b></span><span>Peak estimated depth: <b id="snowGroundPeak">— cm</b></span><span id="snowpackBaseline">Initial snow depth: —</span></div>
+   <div class="charts snowpack-charts"><section class="card chart-card"><div class="chart-title"><i class="chart-legend ground"></i>Snow cover depth · modeled</div><div class="chart-sub">Estimated snowpack in cm · snowfall adds depth; melt and compaction reduce it</div><div class="chart-shell" data-chart="snowGround"><canvas id="snowGround"></canvas><div class="tooltip"></div></div></section></div>
+   <div class="snowpack-config" aria-label="Snow cover modeling parameters">
+    <div class="tuning-field"><label for="snowInitial">Snowpack at period start</label><select id="snowInitial"><option value="model">Start from historical modeled snow depth</option><option value="zero">Assume bare ground</option><option value="custom">Use a custom starting depth</option></select></div>
+    <div class="tuning-field" id="customStartWrap" hidden><label for="snowStartCm">Starting snow depth (cm)</label><input id="snowStartCm" type="number" min="0" max="2000" step="1" value="0"></div>
+    <div class="tuning-field"><label for="meltFactor">Melt sensitivity (mm water / °C / day)</label><input id="meltFactor" type="number" min="0" max="15" step="0.5" value="3"></div>
+    <div class="tuning-field"><label for="settleDays">Settling time scale (days)</label><input id="settleDays" type="number" min="1" max="60" step="1" value="7"></div>
+   </div>
+   <p class="snowpack-caption" id="snowpackMethod">Simplified temperature-index model. Above 0 °C, melt removes snow water equivalent; remaining snow gradually densifies from fresh snow toward a maximum bulk density of 350 kg/m³. The first-hour starting depth comes from Open-Meteo's modeled snow depth where available. Temperature, sunlight, rain-on-snow, terrain and wind can produce substantial real-world differences. Changing settings recalculates the chart without downloading new weather data.</p>
+   <div class="statusline"><span class="status-mark" id="statusMark"></span><span id="statusText" aria-live="polite">Ready to load historical weather.</span><span class="status-spacer"></span><span id="datasetTag">Source: Open-Meteo</span></div>
+   <div class="source-note"><strong>How to read these charts:</strong> “Hourly” is the <em>amount during the preceding hour</em>, not a point-in-time sensor reading. Snow is reported as <em>new snowfall in cm</em>; accumulated snowfall is the sum of new snow even if it later melts. The separate snow-on-ground chart estimates the remaining snowpack using temperature-driven melt, gradual compaction, and a modeled starting depth (where available). These are <strong>model-based historical estimates</strong>, not observations from Yr.no / MET Norway stations. These estimates are sensitive to the initial snow depth and chosen melt/settling assumptions. Large date ranges preserve hourly values in the CSV; the on-screen chart compresses points while preserving rain/snow peaks. Map: <a href="https://kartverket.no/" target="_blank" rel="noopener noreferrer">© Kartverket</a> · Viewer: <a href="https://leafletjs.com/" target="_blank" rel="noopener noreferrer">Leaflet</a> · Weather: <a href="https://open-meteo.com/en/docs/historical-weather-api" target="_blank" rel="noopener noreferrer">Open-Meteo Historical Weather API</a> · data attribution <a href="https://open-meteo.com/en/terms" target="_blank" rel="noopener noreferrer">Open-Meteo.com</a>.</div>
+  </div>
+ </div>
+</main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const cities={Oslo:[59.9139,10.7522],Bergen:[60.3913,5.3221],Trondheim:[63.4305,10.3951],Tromsø:[69.6492,18.9553],Longyearbyen:[78.2232,15.6469],Stavanger:[58.970,5.733],Bodø:[67.280,14.405],Alta:[69.969,23.272],Kristiansand:[58.1467,7.9956]};
+const state={lat:69.6492,lon:18.9553,name:'Tromsø',records:null,apiUrl:'',busy:false,lastLoaded:null,hoverIndex:null};
+// Leaflet topographic map and municipality polygons (Kartverket), adapted from the attached Weather Window app.
+const ROOTS=['https://api.kartverket.no/kommuneinfo/v1','https://ws.geonorge.no/kommuneinfo/v1'];
+let map=null,pin=null,boundaryLayer=null,municipalityGeometry=null,municipalities=[],selectedMunicipality=null,municipalityRequest=0,tiles=null;
+let kommuneMatches=[],activeKommuneIndex=-1;
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/æ/gi,'ae').replace(/ø/gi,'o').replace(/å/gi,'a').toLowerCase();
+function mapStatus(s,err=false){$('mapStatus').textContent=s;$('mapStatus').classList.toggle('error',!!err)}
+function insideRing(lon,lat,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+ const [xi,yi]=ring[i],[xj,yj]=ring[j];const cross=(lon-xi)*(yj-yi)-(lat-yi)*(xj-xi);
+ if(Math.abs(cross)<1e-10&&lon>=Math.min(xi,xj)-1e-10&&lon<=Math.max(xi,xj)+1e-10&&lat>=Math.min(yi,yj)-1e-10&&lat<=Math.max(yi,yj)+1e-10)return true;
+ if((yi>lat)!==(yj>lat)&&lon<((xj-xi)*(lat-yi)/(yj-yi)+xi))inside=!inside;
+ }return inside}
+function insideMunicipality(lat,lon){if(!municipalityGeometry)return true;const g=municipalityGeometry;const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
+ return polys.some(poly=>poly.length&&insideRing(lon,lat,poly[0])&&!poly.slice(1).some(hole=>insideRing(lon,lat,hole)))}
+function hideKommuneMatches(){
+ $('kommuneMatches').hidden=true;
+ $('kommuneSearch').setAttribute('aria-expanded','false');
+ $('kommuneSearch').removeAttribute('aria-activedescendant');
+ activeKommuneIndex=-1;
+}
+function clearMunicipality(quiet=false){
+ ++municipalityRequest;selectedMunicipality=null;municipalityGeometry=null;
+ if(boundaryLayer&&map){map.removeLayer(boundaryLayer);boundaryLayer=null}
+ $('kommuneSearch').value='';$('kommuneCurrent').textContent='No kommune selected · unrestricted pin';
+ hideKommuneMatches();
+ if(!quiet)mapStatus('Kommune outline cleared. Move the pin anywhere on the map.');
+}
+function setPin(){if(!map)return;if(!pin){const icon=L.divIcon({className:'pin-icon-wrap',html:'<span class="kart-pin" aria-hidden="true"></span>',iconSize:[33,42],iconAnchor:[15,36]});
+ pin=L.marker([state.lat,state.lon],{draggable:true,autoPan:true,keyboard:true,icon,title:'Drag to choose weather location'}).addTo(map);
+ pin.on('dragend',evt=>attemptMove(evt.target.getLatLng().lat,evt.target.getLatLng().lng));}
+ pin.setLatLng([state.lat,state.lon]);}
+function updateLocation(lat,lon,name='Selected point',options={}){
+ if(!Number.isFinite(lat)||!Number.isFinite(lon)||lat<55||lat>82||lon< -1||lon>36){showError('Choose coordinates within the Norway map extent (55–82° N, −1–36° E).');setPin();return false}
+ state.lat=lat;state.lon=lon;state.name=name;$('locationName').textContent=name;
+ $('locationCoords').textContent=`${lat.toFixed(4)}° N, ${lon.toFixed(4)}° E`;
+ $('latInput').value=lat.toFixed(4);$('lonInput').value=lon.toFixed(4);setPin();hideError();
+ if(state.lastLoaded){$('periodTitle').textContent=`Selected: ${name}`;$('periodMeta').textContent='Press “Load historical weather” to update the charts for this location';}
+ return true}
+function attemptMove(lat,lon){
+ if(updateLocation(Number(lat),Number(lon),'Selected map point'))
+  mapStatus(`Pin set to ${lat.toFixed(5)}° N, ${lon.toFixed(5)}° E. Kommune boundaries do not restrict placement.`);
+}
+function tileURL(layer){return `https://cache.kartverket.no/v1/wmts/1.0.0/${layer}/default/webmercator/{z}/{y}/{x}.png`}
+function changeBaseLayer(layer){if(!map)return;if(tiles)map.removeLayer(tiles);let errors=0;
+ tiles=L.tileLayer(tileURL(layer),{attribution:'&copy; <a href="https://kartverket.no/" target="_blank" rel="noopener noreferrer">Kartverket</a>',minZoom:3,maxZoom:18,keepBuffer:2}).addTo(map);
+ tiles.on('tileerror',()=>{if(++errors===4)mapStatus('Map tiles could not load. Check connectivity. You can still enter exact coordinates.',true)})}
+function initMap(){if(!window.L){mapStatus('Leaflet could not load. Check your connection or enter coordinates manually.',true);return}
+ map=L.map('kartMap',{zoomControl:true,scrollWheelZoom:true,worldCopyJump:false,zoomSnap:1,wheelPxPerZoomLevel:80}).setView([state.lat,state.lon],8);
+ map.attributionControl.setPrefix(false);map.scrollWheelZoom.enable();
+ changeBaseLayer($('mapStyle').value);setPin();
+ map.on('click',evt=>attemptMove(evt.latlng.lat,evt.latlng.lng));
+ $('mapStyle').addEventListener('change',()=>changeBaseLayer($('mapStyle').value));
+ $('mapExpand').addEventListener('click',()=>{const card=document.querySelector('.map-card');const expanded=card.classList.toggle('map-expanded');
+  $('mapExpand').textContent=expanded?'✕':'⛶';$('mapExpand').setAttribute('aria-label',expanded?'Close expanded map':'Expand map');
+  document.body.style.overflow=expanded?'hidden':'';requestAnimationFrame(()=>{map.invalidateSize({pan:false});map.panTo([state.lat,state.lon],{animate:false});requestAnimationFrame(()=>map.invalidateSize({pan:false}))});});
+ window.addEventListener('keydown',evt=>{if(evt.key==='Escape'&&document.querySelector('.map-card').classList.contains('map-expanded'))$('mapExpand').click()});
+ window.addEventListener('resize',()=>map.invalidateSize());
+ mapStatus('Map ready. Mouse wheel zooms around the cursor; click or drag the pin anywhere.');
+}
+function renderMunicipalities(openMatches=document.activeElement===$('kommuneSearch')){
+ const input=$('kommuneSearch'),q=norm(input.value.trim());
+ kommuneMatches=municipalities.filter(m=>norm(m.name+' '+m.number).includes(q));
+ const panel=$('kommuneMatches');panel.replaceChildren();activeKommuneIndex=-1;
+ if(!kommuneMatches.length){
+  const empty=document.createElement('div');empty.className='kommune-empty';
+  empty.textContent=municipalities.length?'No matching kommune names.':'Loading municipality names…';panel.appendChild(empty);
+ }else{
+  for(let i=0;i<kommuneMatches.length;i++){
+   const m=kommuneMatches[i],button=document.createElement('button');
+   button.type='button';button.className='kommune-match';button.role='option';button.id='kommuneMatch'+i;
+   const name=document.createElement('strong');name.textContent=m.name;
+   const number=document.createElement('span');number.textContent=m.number;
+   button.append(name,number);
+   // Prevent blur before the click is handled.
+   button.addEventListener('mousedown',e=>e.preventDefault());
+   button.addEventListener('click',()=>selectKommuneMatch(m));
+   panel.appendChild(button);
+  }
+ }
+ const show=!!(openMatches&&municipalities.length);
+ panel.hidden=!show;input.setAttribute('aria-expanded',String(show));input.removeAttribute('aria-activedescendant');
+ $('kommuneInfo').textContent=`${kommuneMatches.length} of ${municipalities.length} kommuner match${q?' “'+input.value.trim()+'”':''} · Source: Kartverket. Scroll to see all results.`;
+}
+function selectKommuneMatch(m){
+ $('kommuneSearch').value=`${m.name} (${m.number})`;
+ hideKommuneMatches();
+ $('kommuneCurrent').textContent=`Selected: ${m.name} (${m.number}) · outline only, pin unrestricted`;
+ chooseMunicipality(m);
+}
+function setActiveKommuneMatch(index){
+ if(!kommuneMatches.length)return;
+ activeKommuneIndex=(index+kommuneMatches.length)%kommuneMatches.length;
+ const options=$('kommuneMatches').querySelectorAll('.kommune-match');
+ options.forEach((option,i)=>{option.classList.toggle('is-active',i===activeKommuneIndex);option.setAttribute('aria-selected',String(i===activeKommuneIndex))});
+ const active=options[activeKommuneIndex];if(active){$('kommuneSearch').setAttribute('aria-activedescendant',active.id);active.scrollIntoView({block:'nearest'});}
+}
+async function officialJSON(path){let error;for(const root of ROOTS){try{const controller=new AbortController();const handle=setTimeout(()=>controller.abort(),11000);
+ try{const res=await fetch(root+path,{signal:controller.signal,headers:{Accept:'application/json'}});if(!res.ok)throw Error('HTTP '+res.status);return await res.json()}finally{clearTimeout(handle)}}catch(e){error=e}}
+ throw Error(`Kartverket municipality service unavailable (${error?.message||'network error'})`)}
+function representativePoint(details){const p=details?.punktIOmrade;if(p?.type==='Point'&&p.coordinates?.length>=2){const [lon,lat]=p.coordinates.map(Number);if(Number.isFinite(lat)&&Number.isFinite(lon))return {lat,lon}}return null}
+function fallbackPoint(g){const polys=g.type==='Polygon'?[g.coordinates]:g.type==='MultiPolygon'?g.coordinates:[];
+ for(const poly of polys){if(!poly.length)continue;const ring=poly[0];let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+ for(const [x,y] of ring){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minY=Math.min(minY,y);maxY=Math.max(maxY,y)}
+ for(let n=1;n<=15;n++)for(let iy=1;iy<=n;iy++)for(let ix=1;ix<=n;ix++){const lat=minY+(maxY-minY)*iy/(n+1),lon=minX+(maxX-minX)*ix/(n+1);
+ if(insideMunicipality(lat,lon))return {lat,lon}}}return null}
+async function chooseMunicipality(m){const ver=++municipalityRequest;
+ mapStatus(`Loading official boundary for ${m.name}…`);try{
+ const [details,area]=await Promise.all([officialJSON(`/kommuner/${m.number}?utkoordsys=4258`),officialJSON(`/kommuner/${m.number}/omrade?utkoordsys=4258`)]);
+ if(ver!==municipalityRequest)return;const g=area?.omrade;
+ if(!g||!['Polygon','MultiPolygon'].includes(g.type)||!Array.isArray(g.coordinates))throw Error('Kartverket returned no usable boundary geometry');
+ if(!map){selectedMunicipality=m;municipalityGeometry=g;mapStatus('Municipality selected. Map is unavailable; enter coordinates manually.');return}
+ const newLayer=L.geoJSON({type:'Feature',properties:{},geometry:g},{interactive:false,style:{color:'#e45b40',weight:2.5,fillColor:'#eabf58',fillOpacity:.13}}).addTo(map);
+ if(!newLayer.getBounds().isValid()){map.removeLayer(newLayer);throw Error('Boundary has invalid bounds')}
+ if(boundaryLayer)map.removeLayer(boundaryLayer);boundaryLayer=newLayer;municipalityGeometry=g;selectedMunicipality=m;
+ let newPoint=insideMunicipality(state.lat,state.lon)?{lat:state.lat,lon:state.lon}:representativePoint(details);
+ if(!newPoint||!insideMunicipality(newPoint.lat,newPoint.lon))newPoint=fallbackPoint(g);
+ if(!newPoint)throw Error('No representative point found for the selected kommune');
+ // Don't overwrite a previous chart result; users must explicitly reload if the coordinates change.
+ if(Math.abs(newPoint.lat-state.lat)>.00001||Math.abs(newPoint.lon-state.lon)>.00001)updateLocation(newPoint.lat,newPoint.lon,`${m.name} · map point`);
+ const bounds=newLayer.getBounds();map.invalidateSize();map.fitBounds(bounds.pad(.1),{maxZoom:12,animate:false});
+ $('kommuneCurrent').textContent=`Selected: ${m.name} (${m.number}) · outline only, pin unrestricted`;
+ mapStatus(`Official ${m.name} boundary loaded. The pin can move freely outside the outline.`);
+ }catch(e){if(ver!==municipalityRequest)return;clearMunicipality(true);renderMunicipalities();mapStatus(`Couldn't load that kommune: ${e.message}. Free placement remains available.`,true)}}
+async function loadMunicipalities(){try{const all=await officialJSON('/kommuner');if(!Array.isArray(all))throw Error('Unexpected response');
+ municipalities=all.map(m=>({number:String(m.kommunenummer??'').padStart(4,'0'),name:String(m.kommunenavnNorsk||m.kommunenavn||'').trim()})).filter(m=>/^\d{4}$/.test(m.number)&&m.name).sort((a,b)=>a.name.localeCompare(b.name,'nb'));
+ if(!municipalities.length)throw Error('No municipalities returned');renderMunicipalities();
+ // Initial location remains Tromsø. Searching a kommune is optional and never limits the pin.
+ }catch(err){
+ $('kommuneInfo').textContent='Municipality lookup unavailable. Map clicks and exact coordinates still work.';
+ mapStatus(`Municipality service: ${err.message}`,true);
+}}
+const kommuneSearch=$('kommuneSearch');
+kommuneSearch.addEventListener('input',()=>renderMunicipalities(true));
+kommuneSearch.addEventListener('focus',()=>renderMunicipalities(true));
+kommuneSearch.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){hideKommuneMatches();return}
+ if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+  e.preventDefault();if($('kommuneMatches').hidden)renderMunicipalities(true);
+  setActiveKommuneMatch(activeKommuneIndex+(e.key==='ArrowDown'?1:-1));return;
+ }
+ if(e.key==='Enter'&&!$('kommuneMatches').hidden){
+  e.preventDefault();if(kommuneMatches.length)selectKommuneMatch(kommuneMatches[Math.max(activeKommuneIndex,0)]);
+ }
+});
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.kommune-search-box'))hideKommuneMatches()});
+$('clearKommune').addEventListener('click',()=>{clearMunicipality();renderMunicipalities()});
+$('cityButtons').addEventListener('click',e=>{const btn=e.target.closest('[data-place]');if(!btn)return;const name=btn.dataset.place;const [lat,lon]=cities[name];
+ if(updateLocation(lat,lon,name)&&map){map.setView([lat,lon],name==='Longyearbyen'?9:10);mapStatus(`${name} selected. Pin placement is unrestricted.`)}});
+for(const id of ['latInput','lonInput'])$(id).addEventListener('change',()=>{const lat=Number($('latInput').value),lon=Number($('lonInput').value);
+ if($('latInput').value&&$('lonInput').value&&updateLocation(lat,lon,'Custom coordinates')&&map){map.panTo([lat,lon]);mapStatus('Pin moved to exact coordinates.')}});
+document.querySelectorAll('[data-move]').forEach(btn=>btn.addEventListener('click',()=>{const latStep=0.0018,lonStep=latStep/Math.max(.15,Math.cos(state.lat*Math.PI/180));let lat=state.lat,lon=state.lon;
+ if(btn.dataset.move==='west')lon-=lonStep;else if(btn.dataset.move==='east')lon+=lonStep;else if(btn.dataset.move==='north')lat+=latStep;else lat-=latStep;
+ if(updateLocation(lat,lon,'Selected map point')&&map){map.panTo([lat,lon]);mapStatus('Pin moved approximately 200 metres.')}}));
+function fmtDate(d){const year=d.getFullYear();return `${year}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function daysBack(n){const end=new Date();end.setHours(12,0,0,0);end.setDate(end.getDate()-1);const start=new Date(end);start.setDate(end.getDate()-(n-1));$('startDate').value=fmtDate(start);$('endDate').value=fmtDate(end)}
+$('requestForm').querySelectorAll('[data-days]').forEach(b=>b.addEventListener('click',()=>daysBack(Number(b.dataset.days))));
+const dateFormat=new Intl.DateTimeFormat('en-GB',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+const numberFormat=new Intl.NumberFormat('en-GB',{maximumFractionDigits:1,minimumFractionDigits:1});
+const shortDate=(iso)=>{if(!iso)return '';const a=iso.slice(0,10).split('-');return `${Number(a[2])} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(a[1])-1]} ${a[0]}`};
+function showError(message){$('errorMsg').textContent=message;$('errorMsg').classList.add('visible')}
+function hideError(){$('errorMsg').textContent='';$('errorMsg').classList.remove('visible')}
+function updateStatus(text,kind='neutral'){$('statusText').textContent=text;$('statusMark').className='status-mark'+(kind==='ok'?' ok':kind==='error'?' bad':'')}
+function toApiURL(){const p=new URLSearchParams();p.set('latitude',String(Number(state.lat.toFixed(4))));p.set('longitude',String(Number(state.lon.toFixed(4))));p.set('start_date',$('startDate').value);p.set('end_date',$('endDate').value);p.set('hourly','rain,snowfall,temperature_2m,snow_depth');p.set('timezone','Europe/Oslo');if($('model').value)p.set('models',$('model').value);return 'https://archive-api.open-meteo.com/v1/archive?'+p.toString()}
+$('copyApiBtn').addEventListener('click',async()=>{const url=toApiURL();try{if(navigator.clipboard&&window.isSecureContext)await navigator.clipboard.writeText(url);else{const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();if(!document.execCommand('copy'))throw Error('copy failed');ta.remove()}const btn=$('copyApiBtn');const old=btn.innerHTML;btn.textContent='Copied!';setTimeout(()=>btn.innerHTML=old,1800)}catch(e){window.prompt('Copy API URL:',url)}});
+let currentAbort=null;
+$('cancelBtn').addEventListener('click',()=>{if(currentAbort)currentAbort.abort()});
+$('requestForm').addEventListener('submit',async(e)=>{
+  e.preventDefault();hideError();
+  const start=$('startDate').value,end=$('endDate').value;
+  if(!start||!end){showError('Select both start and end dates.');return}
+  if(start>end){showError('Start date must be before the end date.');return}
+  const today=fmtDate(new Date());
+  if(end>=today){showError('Historical dates must end before today. For very recent days, choose “Best available”.');return}
+  const d1=Date.parse(start+'T12:00:00Z'),d2=Date.parse(end+'T12:00:00Z'),days=(d2-d1)/86400000+1;
+  if(days>3653){showError('Choose a period of up to 10 years at a time to keep the download manageable.');return}
+  const min=$('model').value==='era5_land'?'1950-01-01':'1940-01-01';
+  if(start<min){showError('This dataset begins on '+min+'.');return}
+  if(currentAbort)currentAbort.abort();
+  const abort=new AbortController();currentAbort=abort;
+  $('loadBtn').disabled=true;$('loadText').textContent='Fetching weather…';
+  $('cancelBtn').hidden=false;
+  updateStatus('Requesting hourly rain, snow, temperature and snow depth from Open-Meteo…');
+  $('statusMark').className='status-mark';$('periodTitle').textContent=`Loading ${state.name}…`;
+  const url=toApiURL();state.apiUrl=url;
+  const started=Date.now();
+  const progress=()=>{
+    if(currentAbort!==abort)return;
+    const seconds=Math.round((Date.now()-started)/1000);
+    $('loadText').textContent=`Fetching weather… ${seconds}s`;
+    $('fetchProgress').textContent=seconds>=30?'Still waiting for Open-Meteo. Large historical downloads can take a while; you can cancel.':seconds>=10?'Waiting for historical data… You can cancel this request.':'Contacting the historical weather server…';
+  };
+  progress();const timer=setInterval(progress,1000);
+  let timedOut=false;const timeout=setTimeout(()=>{timedOut=true;abort.abort()},150000);
+  try{
+    const response=await fetch(url,{signal:abort.signal,headers:{Accept:'application/json'}});
+    let payload;
+    try{payload=await response.json()}catch{throw new Error('The weather server returned an unreadable response.')}
+    if(!response.ok||payload.error)throw new Error(payload.reason||`Weather API returned HTTP ${response.status}`);
+    const hourly=payload.hourly;
+    if(!hourly||!Array.isArray(hourly.time)||!Array.isArray(hourly.rain)||!Array.isArray(hourly.snowfall)||!Array.isArray(hourly.temperature_2m))
+      throw new Error('The API returned an unexpected response (rain, snow or temperature is missing).');
+    const t=hourly.time,r=hourly.rain,s=hourly.snowfall,temp=hourly.temperature_2m,depth=hourly.snow_depth;
+    if(t.length===0)throw new Error('No hourly data was available for this date range.');
+    if([r,s,temp].some(a=>t.length!==a.length))throw new Error('Weather records were incomplete.');
+    const rain=[],snow=[],rainCum=[],snowCum=[],temperature=[],modelDepth=[];
+    let totalR=0,totalS=0,peakR=0,peakS=0,missing=0;
+    for(let i=0;i<t.length;i++){
+      const a=Number.isFinite(r[i])?Math.max(0,r[i]):null;
+      const b=Number.isFinite(s[i])?Math.max(0,s[i]):null;
+      const c=Number.isFinite(temp[i])?temp[i]:null;
+      const d=Array.isArray(depth)&&Number.isFinite(depth[i])?Math.max(0,depth[i]*100):null; // API depth: meters -> cm
+      rain.push(a);snow.push(b);temperature.push(c);modelDepth.push(d);
+      if(a===null||b===null||c===null)missing++;
+      if(a!==null){totalR+=a;peakR=Math.max(peakR,a)}
+      if(b!==null){totalS+=b;peakS=Math.max(peakS,b)}
+      rainCum.push(totalR);snowCum.push(totalS);
+    }
+    if(currentAbort!==abort)return;
+    const output={t,rain,snow,temperature,modelDepth,rainCum,snowCum,totalR,totalS,peakR,peakS,missing,n:t.length,units:payload.hourly_units||{},start,end,lat:state.lat,lon:state.lon,name:state.name,model:$('model').selectedOptions[0].textContent};
+    state.records=output;state.lastLoaded={lat:state.lat,lon:state.lon,start,end};
+    $('totalRain').innerHTML=numberFormat.format(totalR)+' <small>mm</small>';
+    $('totalSnow').innerHTML=numberFormat.format(totalS)+' <small>cm</small>';
+    $('peakRain').innerHTML=numberFormat.format(peakR)+' <small>mm</small>';
+    $('peakSnow').innerHTML=numberFormat.format(peakS)+' <small>cm</small>';
+    $('periodTitle').textContent=`Weather at ${state.name}`;
+    $('periodMeta').textContent=`${shortDate(start)} – ${shortDate(end)} · ${t.length.toLocaleString('en-GB')} hourly records · ${state.lat.toFixed(3)}°N, ${state.lon.toFixed(3)}°E`;
+    $('datasetTag').textContent=`Dataset: ${$('model').selectedOptions[0].textContent}`;
+    $('exportBtn').disabled=false;
+    recomputeSnowpack();
+    updateStatus(`${t.length.toLocaleString('en-GB')} hours loaded${missing?' · '+missing+' hour(s) have missing values':''}.`,missing?'error':'ok');
+  }catch(err){
+    if(currentAbort!==abort)return;
+    if(err.name==='AbortError'){
+      const timeoutHit=timedOut;
+      if(timeoutHit)showError('The weather request timed out after 150 seconds. Try a shorter period or another dataset.');
+      updateStatus(timeoutHit?'Historical data request timed out.':'Request cancelled.','error');
+    }else{
+      showError(err instanceof TypeError?'Could not connect to Open-Meteo. Check your internet connection and try again.':err.message);
+      updateStatus('No data loaded for this request.','error');
+    }
+    $('periodTitle').textContent=state.records?`Weather at ${state.records.name}`:`Weather at ${state.name}`;
+  }finally{
+    clearInterval(timer);clearTimeout(timeout);
+    if(abort===currentAbort){
+      $('loadBtn').disabled=false;$('loadText').textContent='Load historical weather';
+      $('cancelBtn').hidden=true;$('fetchProgress').textContent='';currentAbort=null;
+    }
+  }
+});
+
+// The snowpack model is intentionally transparent and adjustable rather than a measured snow depth.
+// Open-Meteo converts 7 cm new snow to 10 mm snow-water equivalent.
+// SWE mm and bulk density kg/m³ imply snow depth cm = SWE / density * 100.
+function recomputeSnowpack(){
+  const r=state.records;if(!r)return;
+  const meltFactor=Math.max(0,Math.min(15,Number($('meltFactor').value)||0)); // mm SWE / (°C · day)
+  const settleDays=Math.max(1,Math.min(60,Number($('settleDays').value)||7));
+  const initialMode=$('snowInitial').value;
+  let initialCm=initialMode==='custom'?Math.max(0,Math.min(2000,Number($('snowStartCm').value)||0)):
+    initialMode==='model'&&r.modelDepth[0]!==null?r.modelDepth[0]:0;
+  const modelBaseline=initialMode==='model'&&r.modelDepth[0]!==null;
+  const START_DENSITY=300, FRESH_DENSITY=1000/7, MAX_DENSITY=350;
+  let swe=initialCm*START_DENSITY/100; // initial depth cm * 10mm/cm * density/1000
+  let density=initialCm>0?START_DENSITY:FRESH_DENSITY;
+  const snowGround=[],snowSwe=[],snowMelt=[];
+  let peak=initialCm, meltTotal=0;
+  for(let i=0;i<r.n;i++){
+    // A baseline modeled depth represents conditions at the first timestamp;
+    // avoid counting the first preceding-hour snowfall on top of that baseline.
+    if(!(i===0&&modelBaseline)){
+      const snowCm=r.snow[i]||0;
+      const addedSwe=snowCm*10/7;
+      if(addedSwe>0){
+        density=swe>0?(swe+addedSwe)/(swe/density+addedSwe/FRESH_DENSITY):FRESH_DENSITY;
+        swe+=addedSwe;
+      }
+    }
+    // Degree-day melt: for every hour above freezing, melt is proportional to °C.
+    const celsius=r.temperature[i];
+    let melted=0;
+    if(swe>0&&celsius!==null&&celsius>0){melted=Math.min(swe,meltFactor*celsius/24);swe-=melted;meltTotal+=melted}
+    // Snow consolidates with age; warmer wet snow consolidates somewhat faster.
+    if(swe>1e-9){
+      const warmMultiplier=celsius!==null&&celsius>0?1+Math.min(celsius,10)*0.1:1;
+      const relaxation=1-Math.exp(-warmMultiplier/(settleDays*24));
+      density+=(MAX_DENSITY-density)*relaxation;
+    }else{swe=0;density=FRESH_DENSITY}
+    const cm=swe>0?swe/density*100:0;
+    snowGround.push(cm);snowSwe.push(swe);snowMelt.push(melted);
+    peak=Math.max(peak,cm);
+  }
+  r.snowGround=snowGround;r.snowSwe=snowSwe;r.snowMelt=snowMelt;
+  r.groundPeak=peak;r.groundEnd=snowGround.at(-1)||0;
+  r.initialGroundCm=initialCm;r.initialGroundSource=modelBaseline?'historical modeled depth':initialMode==='zero'?'assumed bare ground':initialMode==='custom'?'custom value':'0 cm (modeled initial depth unavailable)';
+  r.sweMeltTotal=meltTotal;
+  $('snowGroundEnd').textContent=numberFormat.format(r.groundEnd)+' cm';
+  $('snowGroundPeak').textContent=numberFormat.format(r.groundPeak)+' cm';
+  $('snowpackBaseline').textContent=`Initial: ${numberFormat.format(initialCm)} cm · ${r.initialGroundSource}`;
+  $('snowpackMethod').textContent=`Simplified snowpack model: new snow is converted to snow-water equivalent at Open-Meteo's 7:1 ratio. Snow melts by ${meltFactor} mm of water equivalent per degree above 0 °C per day; the remaining snow settles toward 350 kg/m³ with a ${settleDays}-day relaxation time scale (faster when warm). Starting from ${r.initialGroundSource} (${numberFormat.format(initialCm)} cm). Neither this estimate nor the starting depth is a ground measurement. Solar energy, rain-on-snow, wind, and terrain are not modeled. Changing settings recalculates without a new API request.`;
+  renderAll();
+}
+$('snowInitial').addEventListener('change',()=>{$('customStartWrap').hidden=$('snowInitial').value!=='custom';recomputeSnowpack()});
+for(const id of ['snowStartCm','meltFactor','settleDays'])$(id).addEventListener('input',recomputeSnowpack);
+$('exportBtn').addEventListener('click',()=>{
+ const r=state.records;if(!r)return;
+ const rows=['time_local_europe_oslo,rain_mm_previous_hour,snowfall_cm_previous_hour,temperature_c,model_snow_depth_cm,cumulative_rain_mm,cumulative_snowfall_cm,estimated_snow_on_ground_cm,estimated_snow_water_equivalent_mm,estimated_snow_melt_mm_swe'];
+ for(let i=0;i<r.n;i++){
+  const f=x=>x===null||!Number.isFinite(x)?'':Number(x).toFixed(3);
+  rows.push([r.t[i],f(r.rain[i]),f(r.snow[i]),f(r.temperature[i]),f(r.modelDepth[i]),f(r.rainCum[i]),f(r.snowCum[i]),f(r.snowGround[i]),f(r.snowSwe[i]),f(r.snowMelt[i])].join(','));
+ }
+ const blob=new Blob([rows.join('\r\n')+'\r\n'],{type:'text/csv;charset=utf-8;'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
+ a.download=`norway_precip_${r.lat.toFixed(3)}_${r.lon.toFixed(3)}_${r.start}_${r.end}.csv`;
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);
+});
+
+// Dependency-free, high-DPI chart rendering. When the date range is large,
+// bars show the maximum hourly value per on-screen pixel; totals use the full data.
+const specs={rainHour:{prop:'rain',c:'#0787ae',fill:'rgba(7,135,174,.72)',unit:'mm',kind:'bars'},snowHour:{prop:'snow',c:'#7354bb',fill:'rgba(115,84,187,.72)',unit:'cm',kind:'bars'},rainCum:{prop:'rainCum',c:'#0787ae',fill:'rgba(7,135,174,.11)',unit:'mm',kind:'area'},snowCum:{prop:'snowCum',c:'#7354bb',fill:'rgba(115,84,187,.11)',unit:'cm',kind:'area',label:'Accumulated new snowfall'},snowGround:{prop:'snowGround',c:'#197d91',fill:'rgba(25,125,145,.12)',unit:'cm',kind:'area',label:'Estimated snow on ground',nonMonotonic:true}};
+const charts=Object.keys(specs);
+function niceMax(x){if(!(x>0))return 1;const base=Math.pow(10,Math.floor(Math.log10(x)));for(const v of [1,2,2.5,5,10])if(x<=v*base)return v*base;return 10*base}
+function formatY(y,max){return max>=1000?Math.round(y).toLocaleString('en-GB'):max>=10?Number(y.toFixed(1)).toString():Number(y.toFixed(2)).toString()}
+function timeTick(t,days){const a=t.slice(0,16);if(days<=2)return a.slice(11);if(days<=100)return a.slice(8,10)+' '+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][Number(a.slice(5,7))-1];return a.slice(5,7)+'/'+a.slice(2,4)}
+function renderCanvas(id){const spec=specs[id],data=state.records;const cv=$(id),wrapper=cv.parentElement;const rect=wrapper.getBoundingClientRect();if(rect.width<10)return;const dpr=Math.min(window.devicePixelRatio||1,2);const w=rect.width,h=rect.height;cv.width=Math.floor(w*dpr);cv.height=Math.floor(h*dpr);const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const L=44,R=12,T=15,B=31,PW=w-L-R,PH=h-T-B;if(PW<20)return;const n=data?.n||0,values=data?data[spec.prop]:[];let max=0;if(data){if(spec.kind==='area'&&!spec.nonMonotonic)max=values[n-1]||0;else for(const v of values)if(v!==null)max=Math.max(max,v)}max=niceMax(max*1.08||1);
+ctx.textAlign='right';ctx.textBaseline='middle';ctx.font='10px system-ui,-apple-system,sans-serif';for(let j=0;j<=4;j++){const v=(max*j/4),y=T+PH-(j/4)*PH;ctx.lineWidth=1;ctx.strokeStyle='#e7eef0';ctx.beginPath();ctx.moveTo(L,y+.5);ctx.lineTo(L+PW,y+.5);ctx.stroke();ctx.fillStyle='#92a3aa';ctx.fillText(formatY(v,max),L-8,y)}
+if(!data){ctx.textAlign='center';ctx.font='12px system-ui,-apple-system,sans-serif';ctx.fillStyle='#8ca2ab';ctx.fillText('Select a period and load weather',L+PW/2,T+PH/2);return}
+const xFor=i=>L+(n<=1?.5:(i/(n-1)))*PW,yFor=v=>T+PH-Math.min(max,Math.max(0,v))*PH/max;
+ctx.save();ctx.beginPath();ctx.rect(L,T,PW,PH);ctx.clip();
+if(spec.kind==='bars'){const cols=Math.max(1,Math.floor(PW));if(n<=cols*1.5){const bw=Math.max(1,Math.min(11,PW/n*.84));ctx.fillStyle=spec.fill;for(let i=0;i<n;i++){const v=values[i];if(v===null||v===0)continue;const x=xFor(i),y=yFor(v);ctx.fillRect(x-bw/2,y,bw,Math.max(1,T+PH-y))}}else{ctx.fillStyle=spec.fill;for(let col=0;col<cols;col++){const from=Math.floor(col/cols*n),to=Math.max(from+1,Math.floor((col+1)/cols*n));let peak=0;for(let i=from;i<to;i++)if(values[i]!==null)peak=Math.max(peak,values[i]);if(peak>0){const xx=L+col+0.2,y=yFor(peak);ctx.fillRect(xx,y,1.2,Math.max(1,T+PH-y))}}}}
+else{const pts=Math.min(n,Math.max(2,Math.floor(PW*1.8)));const indices=[];for(let col=0;col<pts;col++)indices.push(Math.min(n-1,Math.round(col/(pts-1)*(n-1))));const drawPath=()=>{ctx.beginPath();for(let c=0;c<indices.length;c++){const i=indices[c],x=xFor(i),y=yFor(values[i]??0);if(c===0)ctx.moveTo(x,y);else ctx.lineTo(x,y)}};
+const grad=ctx.createLinearGradient(0,T,0,T+PH);if(spec.c==='#0787ae'){grad.addColorStop(0,'rgba(7,135,174,.23)');grad.addColorStop(1,'rgba(7,135,174,.018)')}else if(spec.c==='#7354bb'){grad.addColorStop(0,'rgba(115,84,187,.2)');grad.addColorStop(1,'rgba(115,84,187,.014)')}else{grad.addColorStop(0,'rgba(25,125,145,.22)');grad.addColorStop(1,'rgba(25,125,145,.015)')}drawPath();ctx.lineTo(xFor(n-1),T+PH);ctx.lineTo(L,T+PH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();drawPath();ctx.strokeStyle=spec.c;ctx.lineWidth=2;ctx.lineJoin='round';ctx.stroke()}
+if(state.hoverIndex!==null&&state.hoverIndex<n){const i=state.hoverIndex,x=xFor(i),val=values[i]??0;ctx.strokeStyle='#6f82928e';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,T+PH);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.arc(x,yFor(val),3.1,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();ctx.strokeStyle=spec.c;ctx.lineWidth=2;ctx.stroke()}
+ctx.restore();
+ctx.fillStyle='#92a3aa';ctx.textAlign='center';ctx.font='10px system-ui,-apple-system,sans-serif';const days=n/24;for(let k=0;k<5;k++){const i=Math.round((n-1)*k/4),x=xFor(i);ctx.fillText(timeTick(data.t[i],days),Math.max(L+17,Math.min(w-35,x)),h-11)}
+}
+function renderAll(){for(const id of charts)renderCanvas(id)}
+for(const id of charts){const shell=$(id).parentElement;shell.addEventListener('mousemove',e=>{const data=state.records;if(!data)return;const r=shell.getBoundingClientRect();const px=e.clientX-r.left;const index=Math.max(0,Math.min(data.n-1,Math.round((px-44)/(r.width-44-12)*(data.n-1))));state.hoverIndex=index;for(const name of charts){const s=$(name).parentElement,tt=s.querySelector('.tooltip'),val=data[specs[name].prop][index];if(!s.matches(':hover')){tt.style.display='none';continue}tt.style.display='block';tt.innerHTML=`<div class="tt-time">${data.t[index].replace('T',' ')} (Oslo time)</div><strong>${specs[name].label||(name.includes('Cum')?'Accumulated':'Hourly')+' '+(name.toLowerCase().includes('snow')?'snow':'rain')}</strong><div class="tt-val">${val===null?'No data':numberFormat.format(val)+' '+specs[name].unit}</div>${name==='snowGround'&&data.temperature[index]!==null?`<div>Air temperature: ${numberFormat.format(data.temperature[index])} °C</div>`:''}`;tt.style.left=Math.min(Math.max(3,px-72),r.width-155)+'px';tt.style.top='18px';}renderAll();});shell.addEventListener('mouseleave',()=>{state.hoverIndex=null;for(const name of charts)$(name).parentElement.querySelector('.tooltip').style.display='none';renderAll()})}
+let resizeFrame=0;window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(renderAll)});
+if(typeof ResizeObserver!=='undefined'){new ResizeObserver(()=>renderAll()).observe($('rainHour').parentElement)}
+daysBack(21);initMap();updateLocation(state.lat,state.lon,'Tromsø');loadMunicipalities();renderAll();
+// Automatically retrieve the default sample period on open, no installation or local server needed.
+$('requestForm').requestSubmit();
+</script>
+</body></html>
